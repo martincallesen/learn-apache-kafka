@@ -1,0 +1,1 @@
+~/kafka/kafka_2.13-2.6.0/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic word-count-input
