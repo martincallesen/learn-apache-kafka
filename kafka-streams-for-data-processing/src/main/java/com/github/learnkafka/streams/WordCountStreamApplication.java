@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import static com.github.learnkafka.streams.StreamRunner.startStreamApplication;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
-import static com.github.learnkafka.streams.WordCountTopologyBuilder.buildWordCountTopology;
+import static com.github.learnkafka.streams.CountTopologyBuilder.buildWordCountTopology;
 
 public class WordCountStreamApplication {
     public static void main(String[] args) {
