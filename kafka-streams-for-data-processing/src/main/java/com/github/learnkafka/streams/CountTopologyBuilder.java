@@ -1,12 +1,10 @@
 package com.github.learnkafka.streams;
 
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,16 +27,32 @@ public class CountTopologyBuilder {
 
     static Topology buildFavouriteColorCountTopology(String inputTopic, String outputTopic) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, String> textLines = streamsBuilder.stream(inputTopic);
-        KTable<String, Long> wordCounts = textLines.mapValues(CountTopologyBuilder::color)
-                .groupBy((key, color) -> color)
-                .count(Materialized.as("FavoriteColorCounts"));
-        wordCounts.toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));
+        KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
+        inputStream.selectKey(keyOnName())
+                .mapValues(CountTopologyBuilder::color)
+                .to("favourite-color-intermediary", Produced.with(Serdes.String(), Serdes.String()));
+
+        KTable<String, String> table = streamsBuilder.table("favourite-color-intermediary");
+        table.groupBy(color())
+                .count(Materialized.as("FavoriteColorCounts"))
+        .toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));
 
         return streamsBuilder.build();
     }
 
-    private static String color(String key, String value) {
+    private static KeyValueMapper<String, String, KeyValue<String, String>> color() {
+        return (key, color) -> new KeyValue<>(color, "");
+    }
+
+    private static KeyValueMapper<String, String, String> keyOnName() {
+        return (key, value) -> name(value);
+    }
+
+    private static String color(String value) {
         return value.split(",")[1];
+    }
+
+    private static String name(String value) {
+        return value.split(",")[0];
     }
 }
