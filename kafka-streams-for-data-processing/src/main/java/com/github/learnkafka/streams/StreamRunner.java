@@ -6,14 +6,21 @@ import org.apache.kafka.streams.Topology;
 import java.util.Properties;
 
 public class StreamRunner {
-    public static KafkaStreams startStreamApplication(Properties config, Topology topology) {
-        KafkaStreams kafkaStreams = new KafkaStreams(topology, config);
-        kafkaStreams.start();
+    private KafkaStreams kafkaStreams;
 
-        return kafkaStreams;
+    public static StreamRunner startStreamApplication(Properties config, Topology topology) {
+        StreamRunner streamRunner = new StreamRunner();
+        streamRunner.kafkaStreams = new KafkaStreams(topology, config);
+        streamRunner.kafkaStreams.start();
+
+        return streamRunner;
     }
 
-    public static void shutdownStreamApplication(KafkaStreams streams) {
-        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+    public void println() {
+        System.out.println(kafkaStreams.toString());
+    }
+
+    public void shutdown() {
+        Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
     }
 }
