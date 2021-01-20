@@ -1,6 +1,5 @@
 package com.github.learnkafka.streams;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.test.OutputVerifier;
@@ -9,20 +8,16 @@ import org.junit.jupiter.api.Test;
 import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_INPUT;
 import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_OUTPUT;
 
-public class WordCountStreamApplicationTest extends AbstractStreamApplicationTest{
+public class WordCountStreamApplicationTest extends AbstractStreamApplicationTest<String, Long> {
     @Override
-    public String getOutputTopic() {
-        return WORD_COUNT_OUTPUT;
-    }
-
-    @Override
-    protected String getInputTopic() {
-        return WORD_COUNT_INPUT;
-    }
-
-    @Override
-    public StreamApplication createStreamingApplication() {
-        return new WordCountStreamApplication();
+    public StreamTestConfiguration<String, Long> testConfiguration() {
+        return new StreamTestConfigurationBuilder<String, Long>()
+                .inputTopic(WORD_COUNT_INPUT)
+                .outputTopic(WORD_COUNT_OUTPUT)
+                .application(new WordCountStreamApplication())
+                .keySerializer(new StringDeserializer())
+                .valueSerializer(new LongDeserializer())
+                .build();
     }
 
     @Test
@@ -38,12 +33,8 @@ public class WordCountStreamApplicationTest extends AbstractStreamApplicationTes
         OutputVerifier.compareKeyValue(readOutput(), "again", 1L);
     }
 
-    private ProducerRecord<String, Long> readOutput() {
-        return this.testDriver.readOutput(WORD_COUNT_OUTPUT, new StringDeserializer(), new LongDeserializer());
-    }
-
     @Test
-    void lowercaseWords(){
+    void lowercaseWords() {
         sendMessage("KAFKA Kafka kafka");
         OutputVerifier.compareKeyValue(readOutput(), "kafka", 1L);
         OutputVerifier.compareKeyValue(readOutput(), "kafka", 2L);

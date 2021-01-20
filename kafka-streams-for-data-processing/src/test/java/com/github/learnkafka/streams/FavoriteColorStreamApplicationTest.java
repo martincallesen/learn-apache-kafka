@@ -1,6 +1,5 @@
 package com.github.learnkafka.streams;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.test.OutputVerifier;
@@ -9,24 +8,20 @@ import org.junit.jupiter.api.Test;
 import static com.github.learnkafka.streams.FavoriteColorStreamApplication.FAVOURITE_COLOR_INPUT;
 import static com.github.learnkafka.streams.FavoriteColorStreamApplication.FAVOURITE_COLOR_OUTPUT;
 
-public class FavoriteColorStreamApplicationTest extends AbstractStreamApplicationTest{
+public class FavoriteColorStreamApplicationTest extends AbstractStreamApplicationTest<String, Long> {
     @Override
-    public String getOutputTopic() {
-        return FAVOURITE_COLOR_OUTPUT;
-    }
-
-    @Override
-    protected String getInputTopic() {
-        return FAVOURITE_COLOR_INPUT;
-    }
-
-    @Override
-    public FavoriteColorStreamApplication createStreamingApplication() {
-        return new FavoriteColorStreamApplication();
+    public StreamTestConfiguration<String, Long> testConfiguration() {
+        return new StreamTestConfigurationBuilder<String, Long>()
+                .inputTopic(FAVOURITE_COLOR_INPUT)
+                .outputTopic(FAVOURITE_COLOR_OUTPUT)
+                .application(new FavoriteColorStreamApplication())
+                .keySerializer(new StringDeserializer())
+                .valueSerializer(new LongDeserializer())
+                .build();
     }
 
     @Test
-    public void favoriteColorsWithUpdateOnBlue(){
+    public void favoriteColorsWithUpdateOnBlue() {
         sendMessage("stephane,blue");
         OutputVerifier.compareKeyValue(readOutput(), "blue", 1L);
         sendMessage("john,green");
@@ -36,9 +31,5 @@ public class FavoriteColorStreamApplicationTest extends AbstractStreamApplicatio
         OutputVerifier.compareKeyValue(readOutput(), "red", 1L);
         sendMessage("alice,red");
         OutputVerifier.compareKeyValue(readOutput(), "red", 2L);
-    }
-
-    private ProducerRecord<String, Long> readOutput() {
-        return this.testDriver.readOutput(FAVOURITE_COLOR_OUTPUT, new StringDeserializer(), new LongDeserializer());
     }
 }
