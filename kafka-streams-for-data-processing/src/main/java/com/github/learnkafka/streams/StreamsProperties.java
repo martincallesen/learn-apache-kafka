@@ -17,4 +17,11 @@ public class StreamsProperties {
 
         return properties;
     }
+
+    static Properties createStreamExactlyOnceConfiguration(String inputTopic, String outputTopic, String offset) {
+        Properties streamConfiguration = createStreamConfiguration(inputTopic, outputTopic, offset);
+        streamConfiguration.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE);
+
+        return streamConfiguration;
+    }
 }
