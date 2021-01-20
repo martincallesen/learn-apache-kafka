@@ -1,5 +1,7 @@
 package com.github.learnkafka.streams;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,6 +18,7 @@ public class BankTransactionTestEventProducerApplication {
 
     public static void main(String[] args) {
         LOGGER.info("BankTransactionTestEventProducerApplication is running");
+        String topic = "bank-transactions-input";
         Properties configuration = createProducerConfiguration("127.0.0.1:9092");
         BankTransactionTestEventProducerApplication application = new BankTransactionTestEventProducerApplication();
         KafkaProducer<String, String> producer = application.createProducer(configuration);
@@ -24,11 +27,11 @@ public class BankTransactionTestEventProducerApplication {
         try {
             while (true) {
                 LOGGER.info("Sending batch " + batchNumber++);
-                producer.send(createRandomTransaction("bank-transactions-input", "John"));
+                producer.send(createRandomTransaction(topic, "John"));
                 Thread.sleep(100);
-                producer.send(createRandomTransaction("bank-transactions-input", "Hellen"));
+                producer.send(createRandomTransaction(topic, "Hellen"));
                 Thread.sleep(100);
-                producer.send(createRandomTransaction("bank-transactions-input", "Christian"));
+                producer.send(createRandomTransaction(topic, "Christian"));
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
@@ -43,12 +46,13 @@ public class BankTransactionTestEventProducerApplication {
     }
 
     private static ProducerRecord<String, String> createRandomTransaction(String topic, final String name) {
-        String value = "{" +
-                "\"Name\":\"" + name + "\"" +
-                "\"amount\":\"" + getRandomNumberInRange(1, 1000) + "\"" +
-                "\"time\":\"" + LocalDateTime.now() + "\"" +
-                "}";
-        return new ProducerRecord<>(topic, name, value);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("name", name);
+        objectNode.put("amount", getRandomNumberInRange(1, 1000));
+        objectNode.put("time", ""+LocalDateTime.now());
+
+        return new ProducerRecord<>(topic, name, objectNode.toString());
     }
 
     private static Properties createProducerConfiguration(String bootstrapServers) {
