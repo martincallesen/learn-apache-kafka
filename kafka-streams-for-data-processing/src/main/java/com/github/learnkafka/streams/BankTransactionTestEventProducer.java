@@ -37,7 +37,7 @@ public class BankTransactionTestEventProducer {
                 "\"amount\":\"" + getRandomNumberInRange(1, 1000) + "\"" +
                 "\"time\":\"" + LocalDateTime.now() + "\"" +
                 "}";
-        return new ProducerRecord<>(topic, value);
+        return new ProducerRecord<>(topic, name, value);
     }
 
     private static Properties createProducerConfiguration(String bootstrapServers) {
