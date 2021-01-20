@@ -15,19 +15,27 @@ import java.util.Properties;
 
 import static com.github.learnkafka.streams.StreamRunner.CLEAN_UP_STREAMS;
 import static com.github.learnkafka.streams.StreamRunner.startStream;
+import static com.github.learnkafka.streams.StreamsProperties.createStreamExactlyOnceConfiguration;
 
 public class BankBalanceStreamApplication {
     public static final Logger LOGGER = LoggerFactory.getLogger(BankBalanceStreamApplication.class);
+    public static final String BANK_TRANSACTIONS_INPUT = "bank-transactions-input";
+    public static final String BANK_BALANCE_OUTPUT = "bank-balance-output";
 
     public static void main(String[] args) {
-        Properties config = StreamsProperties.createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
-        Topology topology = createTopology("bank-transactions-input", "bank-balance-output");
+        BankBalanceStreamApplication application = new BankBalanceStreamApplication();
+        Properties config = application.createConfiguration();
+        Topology topology = application.createTopology(BANK_TRANSACTIONS_INPUT, BANK_BALANCE_OUTPUT);
         StreamRunner streamRunner = startStream(config, topology, CLEAN_UP_STREAMS);
         streamRunner.printTopology();
         streamRunner.shutdown();
     }
 
-    private static Topology createTopology(String inputTopic, String outputTopic) {
+    public Properties createConfiguration() {
+        return createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
+    }
+
+    public Topology createTopology(String inputTopic, String outputTopic) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
         KGroupedStream<String, String> stringStringKGroupedStream = inputStream.groupByKey();
@@ -48,9 +56,9 @@ public class BankBalanceStreamApplication {
             try {
                 JsonNode jsonNode = getJsonNode(newValue);
                 long amount = jsonNode.get("amount").longValue();
-                String time = jsonNode.get("time").toString();
+                String time = jsonNode.get("time").asText();
                 long balance = getBalance(aggValue);
-                jsonBalanceEvent = createJSONBalanceEvent(key, time, amount+balance);
+                jsonBalanceEvent = createBalance(key, time, amount+balance);
 
             } catch (JsonProcessingException e) {
                 LOGGER.error("Could not parsen to json", e);
@@ -70,7 +78,7 @@ public class BankBalanceStreamApplication {
         return objectMapper.readTree(json);
     }
 
-    private static String createJSONBalanceEvent(String key, String time, long balance) {
+    public static String createBalance(String key, String time, long balance) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         node.put("name", key);

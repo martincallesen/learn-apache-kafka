@@ -46,13 +46,26 @@ public class BankTransactionTestEventProducerApplication {
     }
 
     private static ProducerRecord<String, String> createRandomTransaction(String topic, final String name) {
+        ObjectNode objectNode = createRandomTransaction(name);
+
+        return new ProducerRecord<>(topic, name, objectNode.toString());
+    }
+
+    public static ObjectNode createRandomTransaction(String name) {
+        int amount = getRandomNumberInRange(1, 1000);
+        String time = "" + LocalDateTime.now();
+
+        return createTransaction(name, amount, time);
+    }
+
+    public static ObjectNode createTransaction(String name, int amount, String time) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("name", name);
-        objectNode.put("amount", getRandomNumberInRange(1, 1000));
-        objectNode.put("time", ""+LocalDateTime.now());
+        objectNode.put("amount", amount);
+        objectNode.put("time", time);
 
-        return new ProducerRecord<>(topic, name, objectNode.toString());
+        return objectNode;
     }
 
     private static Properties createProducerConfiguration(String bootstrapServers) {
