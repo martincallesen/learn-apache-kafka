@@ -11,9 +11,13 @@ import java.util.Properties;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
 public class FavoriteColorStreamApplication {
+    public static final String FAVOURITE_COLOR_INPUT = "favourite-color-input";
+    public static final String FAVOURITE_COLOR_INTERMEDIARY = "favourite-color-intermediary";
+    public static final String FAVOURITE_COLOR_OUTPUT = "favourite-color-output";
+
     public static void main(String[] args) {
         FavoriteColorStreamApplication app = new FavoriteColorStreamApplication();
-        Topology topology = app.createTopology("favourite-color-input", "favourite-color-output");
+        Topology topology = app.createTopology(FAVOURITE_COLOR_INPUT, FAVOURITE_COLOR_OUTPUT);
         Properties configuration = app.createConfiguration();
         StreamRunner streamRunner = StreamRunner.startStream(configuration, topology);
         streamRunner.printTopology();
@@ -29,9 +33,9 @@ public class FavoriteColorStreamApplication {
         KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
         inputStream.selectKey(FavoriteColorStreamApplication.keyOnName())
                 .mapValues(FavoriteColorStreamApplication::colorKeyValue)
-                .to("favourite-color-intermediary", Produced.with(Serdes.String(), Serdes.String()));
+                .to(FAVOURITE_COLOR_INTERMEDIARY, Produced.with(Serdes.String(), Serdes.String()));
 
-        KTable<String, String> table = streamsBuilder.table("favourite-color-intermediary");
+        KTable<String, String> table = streamsBuilder.table(FAVOURITE_COLOR_INTERMEDIARY);
         table.groupBy(FavoriteColorStreamApplication.colorKeyValue())
                 .count(Materialized.as("FavoriteColorCounts"))
         .toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));
