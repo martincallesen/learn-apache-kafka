@@ -15,10 +15,14 @@ import java.util.Properties;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
 public class WordCountStreamApplication {
+
+    public static final String WORD_COUNT_INPUT = "word-count-input";
+    public static final String WORD_COUNT_OUTPUT = "word-count-output";
+
     public static void main(String[] args) {
         WordCountStreamApplication app = new WordCountStreamApplication();
         Properties configuration = app.createConfiguration();
-        Topology topology = app.createTopology("word-count-input", "word-count-output");
+        Topology topology = app.createTopology(WORD_COUNT_INPUT, WORD_COUNT_OUTPUT);
         StreamRunner streamRunner = StreamRunner.startStream(configuration, topology);
         streamRunner.printTopology();
         streamRunner.shutdown();

@@ -14,15 +14,17 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
+import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_INPUT;
+import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_OUTPUT;
+
 public class WordCountStreamApplicationTest {
-    public static final String WORD_COUNT_OUTPUT = "word-count-output";
     private TopologyTestDriver testDriver;
     private ConsumerRecordFactory<String, String> consumerRecordFactory;
 
     @BeforeEach
     public void createTestDriver() {
         WordCountStreamApplication app = new WordCountStreamApplication();
-        Topology topology = app.createTopology("word-count-input", WORD_COUNT_OUTPUT);
+        Topology topology = app.createTopology(WORD_COUNT_INPUT, WORD_COUNT_OUTPUT);
         Properties configuration = app.createConfiguration();
         this.testDriver = new TopologyTestDriver(topology, configuration);
         StringSerializer stringSerializer = new StringSerializer();
