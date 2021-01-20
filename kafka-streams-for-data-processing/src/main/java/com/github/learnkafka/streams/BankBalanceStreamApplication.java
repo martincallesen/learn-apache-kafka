@@ -21,13 +21,13 @@ public class BankBalanceStreamApplication {
 
     public static void main(String[] args) {
         Properties config = StreamsProperties.createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
-        Topology topology = buildBankBalanceTopology("bank-transactions-input", "bank-balance-output");
+        Topology topology = createTopology("bank-transactions-input", "bank-balance-output");
         StreamRunner streamRunner = startStream(config, topology, CLEAN_UP_STREAMS);
         streamRunner.printTopology();
         streamRunner.shutdown();
     }
 
-    private static Topology buildBankBalanceTopology(String inputTopic, String outputTopic) {
+    private static Topology createTopology(String inputTopic, String outputTopic) {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
         KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
         KGroupedStream<String, String> stringStringKGroupedStream = inputStream.groupByKey();
