@@ -3,37 +3,26 @@ package com.github.learnkafka.streams;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.TopologyTestDriver;
-import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Properties;
 
 import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_INPUT;
 import static com.github.learnkafka.streams.WordCountStreamApplication.WORD_COUNT_OUTPUT;
 
-public class WordCountStreamApplicationTest {
-    private TopologyTestDriver testDriver;
-    private ConsumerRecordFactory<String, String> consumerRecordFactory;
-
-    @BeforeEach
-    public void createTestDriver() {
-        WordCountStreamApplication app = new WordCountStreamApplication();
-        Topology topology = app.createTopology(WORD_COUNT_INPUT, WORD_COUNT_OUTPUT);
-        Properties configuration = app.createConfiguration();
-        this.testDriver = new TopologyTestDriver(topology, configuration);
-        StringSerializer stringSerializer = new StringSerializer();
-        this.consumerRecordFactory = new ConsumerRecordFactory<>(stringSerializer, stringSerializer);
+public class WordCountStreamApplicationTest extends AbstractStreamApplicationTest{
+    @Override
+    public String getOutputTopic() {
+        return WORD_COUNT_OUTPUT;
     }
 
-    @AfterEach
-    public void closeTestDriver() {
-        testDriver.close();
+    @Override
+    protected String getInputTopic() {
+        return WORD_COUNT_INPUT;
+    }
+
+    @Override
+    public StreamApplication createStreamingApplication() {
+        return new WordCountStreamApplication();
     }
 
     @Test
@@ -51,10 +40,6 @@ public class WordCountStreamApplicationTest {
 
     private ProducerRecord<String, Long> readOutput() {
         return this.testDriver.readOutput(WORD_COUNT_OUTPUT, new StringDeserializer(), new LongDeserializer());
-    }
-
-    private void sendMessage(String msg) {
-        this.testDriver.pipeInput(this.consumerRecordFactory.create("word-count-input", null, msg));
     }
 
     @Test
