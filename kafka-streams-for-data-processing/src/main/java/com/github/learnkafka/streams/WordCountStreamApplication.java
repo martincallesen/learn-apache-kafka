@@ -13,7 +13,7 @@ public class WordCountStreamApplication {
         Properties config = createStreamConfiguration("word-counts", "localhost:9092", "earliest");
         Topology topology = buildWordCountTopology("word-count-input", "word-count-output");
         StreamRunner streamRunner = startStreamApplication(config, topology);
-        streamRunner.println();
+        streamRunner.printTopology();
         streamRunner.shutdown();
     }
 }

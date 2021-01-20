@@ -23,7 +23,7 @@ public class BankBalanceStreamApplication {
         Properties config = StreamsProperties.createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
         Topology topology = buildBankBalanceTopology("bank-transactions-input", "bank-balance-output");
         StreamRunner streamRunner = startStreamApplication(config, topology, CLEAN_UP_STREAMS);
-        streamRunner.println();
+        streamRunner.printTopology();
         streamRunner.shutdown();
     }
 

@@ -13,7 +13,7 @@ public class FavoriteColorStreamApplication {
         Properties config = createStreamConfiguration("favourite-color", "localhost:9092", "earliest");
         Topology topology = buildFavouriteColorCountTopology("favourite-color-input", "favourite-color-output");
         StreamRunner streamRunner = startStreamApplication(config, topology);
-        streamRunner.println();
+        streamRunner.printTopology();
         streamRunner.shutdown();
     }
 }

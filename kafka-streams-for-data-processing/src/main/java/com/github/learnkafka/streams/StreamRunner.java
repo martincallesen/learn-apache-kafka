@@ -27,7 +27,7 @@ public class StreamRunner {
         return streamRunner;
     }
 
-    public void println() {
+    public void printTopology() {
         System.out.println(kafkaStreams.toString());
     }
 
