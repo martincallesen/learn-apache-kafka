@@ -10,11 +10,11 @@ public class StreamRunner {
     public static final boolean CLEAN_UP_STREAMS = true;
     private KafkaStreams kafkaStreams;
 
-    public static StreamRunner startStreamApplication(Properties config, Topology topology) {
-        return startStreamApplication(config, topology, DONT_CLEAN_UP_STREAMS);
+    public static StreamRunner startStream(Properties config, Topology topology) {
+        return startStream(config, topology, DONT_CLEAN_UP_STREAMS);
     }
 
-    public static StreamRunner startStreamApplication(Properties config, Topology topology, boolean cleanUp) {
+    public static StreamRunner startStream(Properties config, Topology topology, boolean cleanUp) {
         StreamRunner streamRunner = new StreamRunner();
         streamRunner.kafkaStreams = new KafkaStreams(topology, config);
 

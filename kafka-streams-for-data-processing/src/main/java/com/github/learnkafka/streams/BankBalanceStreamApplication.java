@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 
 import static com.github.learnkafka.streams.StreamRunner.CLEAN_UP_STREAMS;
-import static com.github.learnkafka.streams.StreamRunner.startStreamApplication;
+import static com.github.learnkafka.streams.StreamRunner.startStream;
 
 public class BankBalanceStreamApplication {
     public static final Logger LOGGER = LoggerFactory.getLogger(BankBalanceStreamApplication.class);
@@ -22,7 +22,7 @@ public class BankBalanceStreamApplication {
     public static void main(String[] args) {
         Properties config = StreamsProperties.createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
         Topology topology = buildBankBalanceTopology("bank-transactions-input", "bank-balance-output");
-        StreamRunner streamRunner = startStreamApplication(config, topology, CLEAN_UP_STREAMS);
+        StreamRunner streamRunner = startStream(config, topology, CLEAN_UP_STREAMS);
         streamRunner.printTopology();
         streamRunner.shutdown();
     }
