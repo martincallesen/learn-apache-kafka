@@ -27,6 +27,22 @@ public class StreamRunner {
         return streamRunner;
     }
 
+    public static void startStream(StreamApplication application) {
+        startStream(application, DONT_CLEAN_UP_STREAMS);
+    }
+
+    public static void startCleanStream(StreamApplication application) {
+        startStream(application, CLEAN_UP_STREAMS);
+    }
+
+    private static void startStream(StreamApplication application, boolean cleanUpStreams) {
+        Properties configuration = application.createConfiguration();
+        Topology topology = application.createTopology();
+        StreamRunner streamRunner = StreamRunner.startStream(configuration, topology, cleanUpStreams);
+        streamRunner.printTopology();
+        streamRunner.shutdown();
+    }
+
     public void printTopology() {
         System.out.println(kafkaStreams.toString());
     }

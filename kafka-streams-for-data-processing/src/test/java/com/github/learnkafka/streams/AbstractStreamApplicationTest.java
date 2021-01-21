@@ -20,7 +20,7 @@ public abstract class AbstractStreamApplicationTest<K, V>{
     public final void createTestDriver() {
         this.testConfig = testConfiguration();
         StreamApplication app = testConfiguration().getApplication();
-        Topology topology = app.createTopology(testConfig.getInput(), testConfig.getOutput());
+        Topology topology = app.createTopology();
         Properties configuration = app.createConfiguration();
         this.testDriver = new TopologyTestDriver(topology, configuration);
         StringSerializer stringSerializer = new StringSerializer();

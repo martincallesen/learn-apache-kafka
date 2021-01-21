@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-import static com.github.learnkafka.streams.StreamRunner.CLEAN_UP_STREAMS;
-import static com.github.learnkafka.streams.StreamRunner.startStream;
+import static com.github.learnkafka.streams.StreamRunner.*;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamExactlyOnceConfiguration;
 
 public class BankBalanceStreamApplication implements StreamApplication{
@@ -23,24 +22,21 @@ public class BankBalanceStreamApplication implements StreamApplication{
     public static final String BANK_BALANCE_OUTPUT = "bank-balance-output";
 
     public static void main(String[] args) {
-        BankBalanceStreamApplication application = new BankBalanceStreamApplication();
-        Properties config = application.createConfiguration();
-        Topology topology = application.createTopology(BANK_TRANSACTIONS_INPUT, BANK_BALANCE_OUTPUT);
-        StreamRunner streamRunner = startStream(config, topology, CLEAN_UP_STREAMS);
-        streamRunner.printTopology();
-        streamRunner.shutdown();
+        startCleanStream(new BankBalanceStreamApplication());
     }
 
+    @Override
     public Properties createConfiguration() {
         return createStreamExactlyOnceConfiguration("bank-balance", "localhost:9092", "earliest");
     }
 
-    public Topology createTopology(String inputTopic, String outputTopic) {
+    @Override
+    public Topology createTopology() {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
+        KStream<String, String> inputStream = streamsBuilder.stream(BANK_TRANSACTIONS_INPUT);
         KGroupedStream<String, String> stringStringKGroupedStream = inputStream.groupByKey();
         KTable<String, String> aggregate = stringStringKGroupedStream.aggregate(init(), calculateBalance());
-        aggregate.toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.String()));
+        aggregate.toStream().to(BANK_BALANCE_OUTPUT, Produced.with(Serdes.String(), Serdes.String()));
 
         return streamsBuilder.build();
     }

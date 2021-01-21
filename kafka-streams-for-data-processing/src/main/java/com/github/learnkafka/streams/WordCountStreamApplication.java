@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import static com.github.learnkafka.streams.StreamRunner.startStream;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
 public class WordCountStreamApplication implements StreamApplication{
@@ -19,25 +20,22 @@ public class WordCountStreamApplication implements StreamApplication{
     public static final String WORD_COUNT_OUTPUT = "word-count-output";
 
     public static void main(String[] args) {
-        WordCountStreamApplication app = new WordCountStreamApplication();
-        Properties configuration = app.createConfiguration();
-        Topology topology = app.createTopology(WORD_COUNT_INPUT, WORD_COUNT_OUTPUT);
-        StreamRunner streamRunner = StreamRunner.startStream(configuration, topology);
-        streamRunner.printTopology();
-        streamRunner.shutdown();
+        startStream(new WordCountStreamApplication());
     }
 
+    @Override
     public Properties createConfiguration() {
         return createStreamConfiguration("word-counts", "localhost:9092", "earliest");
     }
 
-    public Topology createTopology(String inputTopic, String outputTopic) {
+    @Override
+    public Topology createTopology() {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, String> textLines = streamsBuilder.stream(inputTopic);
+        KStream<String, String> textLines = streamsBuilder.stream(WORD_COUNT_INPUT);
         KTable<String, Long> wordCounts = textLines.flatMapValues(WordCountStreamApplication::splitOnWhiteSpace)
                 .groupBy((key, word) -> word)
                 .count(Materialized.as("Counts"));
-        wordCounts.toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));
+        wordCounts.toStream().to(WORD_COUNT_OUTPUT, Produced.with(Serdes.String(), Serdes.Long()));
 
         return streamsBuilder.build();
     }

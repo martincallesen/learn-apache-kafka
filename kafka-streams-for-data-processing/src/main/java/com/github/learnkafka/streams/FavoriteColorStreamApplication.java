@@ -8,6 +8,7 @@ import org.apache.kafka.streams.kstream.*;
 
 import java.util.Properties;
 
+import static com.github.learnkafka.streams.StreamRunner.startStream;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
 public class FavoriteColorStreamApplication implements StreamApplication{
@@ -16,21 +17,18 @@ public class FavoriteColorStreamApplication implements StreamApplication{
     public static final String FAVOURITE_COLOR_OUTPUT = "favourite-color-output";
 
     public static void main(String[] args) {
-        FavoriteColorStreamApplication app = new FavoriteColorStreamApplication();
-        Topology topology = app.createTopology(FAVOURITE_COLOR_INPUT, FAVOURITE_COLOR_OUTPUT);
-        Properties configuration = app.createConfiguration();
-        StreamRunner streamRunner = StreamRunner.startStream(configuration, topology);
-        streamRunner.printTopology();
-        streamRunner.shutdown();
+        startStream(new FavoriteColorStreamApplication());
     }
 
+    @Override
     public Properties createConfiguration() {
         return createStreamConfiguration("favourite-color", "localhost:9092", "earliest");
     }
 
-    public Topology createTopology(String inputTopic, String outputTopic) {
+    @Override
+    public Topology createTopology() {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, String> inputStream = streamsBuilder.stream(inputTopic);
+        KStream<String, String> inputStream = streamsBuilder.stream(FAVOURITE_COLOR_INPUT);
         inputStream.selectKey(FavoriteColorStreamApplication.keyOnName())
                 .mapValues(FavoriteColorStreamApplication::colorKeyValue)
                 .to(FAVOURITE_COLOR_INTERMEDIARY, Produced.with(Serdes.String(), Serdes.String()));
@@ -38,7 +36,7 @@ public class FavoriteColorStreamApplication implements StreamApplication{
         KTable<String, String> table = streamsBuilder.table(FAVOURITE_COLOR_INTERMEDIARY);
         table.groupBy(FavoriteColorStreamApplication.colorKeyValue())
                 .count(Materialized.as("FavoriteColorCounts"))
-        .toStream().to(outputTopic, Produced.with(Serdes.String(), Serdes.Long()));
+        .toStream().to(FAVOURITE_COLOR_OUTPUT, Produced.with(Serdes.String(), Serdes.Long()));
 
         return streamsBuilder.build();
     }
