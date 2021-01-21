@@ -34,19 +34,18 @@ public abstract class AbstractStreamApplicationTest<K, V>{
         testDriver.close();
     }
 
-    public final void sendMessage(String msg) {
-        sendMessage(null, msg);
+    public final void writeInput(String topic, String msg) {
+        writeInput(topic, null, msg);
     }
 
-    public final void sendMessage(String key, String msg) {
-        this.testDriver.pipeInput(this.consumerRecordFactory.create(testConfig.getInput(), key, msg));
+    public final void writeInput(String topic, String key, String msg) {
+        this.testDriver.pipeInput(this.consumerRecordFactory.create(topic, key, msg));
     }
 
-    public final ProducerRecord<K, V> readOutput() {
-        String output = testConfig.getOutput();
+    public final ProducerRecord<K, V> readOutput(String outputTopic) {
         Deserializer<K> keySerializer = testConfig.getKeySerializer();
         Deserializer<V> valueSerializer = testConfig.getValueSerializer();
 
-        return this.testDriver.readOutput(output, keySerializer, valueSerializer);
+        return this.testDriver.readOutput(outputTopic, keySerializer, valueSerializer);
     }
 }
