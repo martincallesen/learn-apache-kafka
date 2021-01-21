@@ -12,7 +12,7 @@ public class FavoriteColorStreamApplicationTest extends AbstractStreamApplicatio
     @Override
     public StreamTestConfiguration<String, Long> testConfiguration() {
         return new StreamTestConfigurationBuilder<String, Long>()
-                .application(new FavoriteColorStreamApplication())
+                .streamsParameters(new FavoriteColorStreamApplication())
                 .keySerializer(new StringDeserializer())
                 .valueSerializer(new LongDeserializer())
                 .build();

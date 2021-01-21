@@ -16,7 +16,7 @@ import java.util.Properties;
 import static com.github.learnkafka.streams.StreamRunner.*;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamExactlyOnceConfiguration;
 
-public class BankBalanceStreamApplication implements StreamApplication{
+public class BankBalanceStreamApplication implements KafkaStreamsParameters {
     public static final Logger LOGGER = LoggerFactory.getLogger(BankBalanceStreamApplication.class);
     public static final String BANK_TRANSACTIONS_INPUT = "bank-transactions-input";
     public static final String BANK_BALANCE_OUTPUT = "bank-balance-output";

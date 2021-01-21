@@ -11,7 +11,7 @@ public class BankBalanceStreamApplicationTest extends AbstractStreamApplicationT
     @Override
     public StreamTestConfiguration<String, String> testConfiguration(){
         return new StreamTestConfigurationBuilder<String, String>()
-                .application(new BankBalanceStreamApplication())
+                .streamsParameters(new BankBalanceStreamApplication())
                 .keySerializer(new StringDeserializer())
                 .valueSerializer(new StringDeserializer())
                 .build();

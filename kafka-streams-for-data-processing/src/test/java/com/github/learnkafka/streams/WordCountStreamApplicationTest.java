@@ -12,7 +12,7 @@ public class WordCountStreamApplicationTest extends AbstractStreamApplicationTes
     @Override
     public StreamTestConfiguration<String, Long> testConfiguration() {
         return new StreamTestConfigurationBuilder<String, Long>()
-                .application(new WordCountStreamApplication())
+                .streamsParameters(new WordCountStreamApplication())
                 .keySerializer(new StringDeserializer())
                 .valueSerializer(new LongDeserializer())
                 .build();

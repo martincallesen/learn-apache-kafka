@@ -19,9 +19,9 @@ public abstract class AbstractStreamApplicationTest<K, V>{
     @BeforeEach
     public final void createTestDriver() {
         this.testConfig = testConfiguration();
-        StreamApplication app = testConfiguration().getApplication();
-        Topology topology = app.createTopology();
-        Properties configuration = app.createConfiguration();
+        KafkaStreamsParameters parameters = testConfig.getStreamsParameters();
+        Topology topology = parameters.createTopology();
+        Properties configuration = parameters.createConfiguration();
         this.testDriver = new TopologyTestDriver(topology, configuration);
         StringSerializer stringSerializer = new StringSerializer();
         this.consumerRecordFactory = new ConsumerRecordFactory<>(stringSerializer, stringSerializer);

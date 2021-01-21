@@ -15,7 +15,7 @@ import java.util.Properties;
 import static com.github.learnkafka.streams.StreamRunner.startStream;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
-public class WordCountStreamApplication implements StreamApplication{
+public class WordCountStreamApplication implements KafkaStreamsParameters {
     public static final String WORD_COUNT_INPUT = "word-count-input";
     public static final String WORD_COUNT_OUTPUT = "word-count-output";
 

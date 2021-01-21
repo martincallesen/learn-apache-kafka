@@ -11,7 +11,7 @@ import java.util.Properties;
 import static com.github.learnkafka.streams.StreamRunner.startStream;
 import static com.github.learnkafka.streams.StreamsProperties.createStreamConfiguration;
 
-public class FavoriteColorStreamApplication implements StreamApplication{
+public class FavoriteColorStreamApplication implements KafkaStreamsParameters {
     public static final String FAVOURITE_COLOR_INPUT = "favourite-color-input";
     public static final String FAVOURITE_COLOR_INTERMEDIARY = "favourite-color-intermediary";
     public static final String FAVOURITE_COLOR_OUTPUT = "favourite-color-output";

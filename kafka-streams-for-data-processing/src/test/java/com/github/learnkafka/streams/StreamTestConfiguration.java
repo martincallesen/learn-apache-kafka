@@ -3,19 +3,19 @@ package com.github.learnkafka.streams;
 import org.apache.kafka.common.serialization.Deserializer;
 
 public class StreamTestConfiguration<K,V> {
-    private final StreamApplication application;
+    private final KafkaStreamsParameters streamsParameters;
     private final Deserializer<K> keySerializer;
     private final Deserializer<V> valueSerializer;
 
-    public StreamTestConfiguration(StreamApplication application, Deserializer<K> keySerializer, Deserializer<V> valueSerializer) {
-        this.application = application;
+    public StreamTestConfiguration(KafkaStreamsParameters streamsParameters, Deserializer<K> keySerializer, Deserializer<V> valueSerializer) {
+        this.streamsParameters = streamsParameters;
         this.keySerializer = keySerializer;
         this.valueSerializer = valueSerializer;
     }
 
 
-    public StreamApplication getApplication() {
-        return application;
+    public KafkaStreamsParameters getStreamsParameters() {
+        return streamsParameters;
     }
 
     public Deserializer<K> getKeySerializer() {

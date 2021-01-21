@@ -4,7 +4,7 @@ import org.apache.kafka.streams.Topology;
 
 import java.util.Properties;
 
-public interface StreamApplication {
+public interface KafkaStreamsParameters {
     Topology createTopology();
     Properties createConfiguration();
 }
