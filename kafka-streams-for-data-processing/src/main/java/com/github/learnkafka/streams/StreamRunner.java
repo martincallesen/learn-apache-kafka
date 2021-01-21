@@ -21,22 +21,16 @@ public class StreamRunner {
     private static void startStream(KafkaStreamsParameters parameters, boolean cleanUpStreams) {
         Properties configuration = parameters.createConfiguration();
         Topology topology = parameters.createTopology();
-        StreamRunner streamRunner = StreamRunner.startStream(topology, configuration, cleanUpStreams);
-        streamRunner.printTopology();
-        streamRunner.shutdown();
-    }
-
-    private static StreamRunner startStream(Topology topology, Properties config, boolean cleanUp) {
         StreamRunner streamRunner = new StreamRunner();
-        streamRunner.kafkaStreams = new KafkaStreams(topology, config);
+        streamRunner.kafkaStreams = new KafkaStreams(topology, configuration);
 
-        if(cleanUp) {
+        if(cleanUpStreams) {
             streamRunner.kafkaStreams.cleanUp();
         }
 
         streamRunner.kafkaStreams.start();
-
-        return streamRunner;
+        streamRunner.printTopology();
+        streamRunner.shutdown();
     }
 
     private void printTopology() {
