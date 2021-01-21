@@ -11,18 +11,25 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Properties;
 
-public abstract class AbstractStreamApplicationTest<K, V>{
+import static org.apache.kafka.streams.test.OutputVerifier.compareKeyValue;
+
+public abstract class AbstractKafkaStreamTest<K, V>{
     private TopologyTestDriver testDriver;
     private ConsumerRecordFactory<String, String> consumerRecordFactory;
-    private StreamTestConfiguration<K, V> testConfig;
+    private Deserializer<K> keySerializer;
+    private Deserializer<V> valueSerializer;
 
     @BeforeEach
     public final void createTestDriver() {
-        this.testConfig = testConfiguration();
+        StreamTestConfiguration<K, V> testConfig = testConfiguration();
+        this.keySerializer = testConfig.getKeySerializer();
+        this.valueSerializer = testConfig.getValueSerializer();
+
         KafkaStreamsParameters parameters = testConfig.getStreamsParameters();
         Topology topology = parameters.createTopology();
         Properties configuration = parameters.createConfiguration();
         this.testDriver = new TopologyTestDriver(topology, configuration);
+
         StringSerializer stringSerializer = new StringSerializer();
         this.consumerRecordFactory = new ConsumerRecordFactory<>(stringSerializer, stringSerializer);
     }
@@ -43,9 +50,10 @@ public abstract class AbstractStreamApplicationTest<K, V>{
     }
 
     public final ProducerRecord<K, V> readOutput(String outputTopic) {
-        Deserializer<K> keySerializer = testConfig.getKeySerializer();
-        Deserializer<V> valueSerializer = testConfig.getValueSerializer();
-
         return this.testDriver.readOutput(outputTopic, keySerializer, valueSerializer);
+    }
+
+    public void assertOutput(String outputTopic, K expectedKey, V expectedValue) {
+        compareKeyValue(readOutput(outputTopic), expectedKey, expectedValue);
     }
 }

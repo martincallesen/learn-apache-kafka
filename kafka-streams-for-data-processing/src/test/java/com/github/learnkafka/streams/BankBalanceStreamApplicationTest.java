@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.learnkafka.streams.BankBalanceStreamApplication.*;
 import static com.github.learnkafka.streams.BankTransactionTestEventProducerApplication.createTransaction;
-import static org.apache.kafka.streams.test.OutputVerifier.compareKeyValue;
 
-public class BankBalanceStreamApplicationTest extends AbstractStreamApplicationTest<String, String>{
+public class BankBalanceStreamApplicationTest extends AbstractKafkaStreamTest<String, String> {
     @Override
     public StreamTestConfiguration<String, String> testConfiguration(){
         return new StreamTestConfigurationBuilder<String, String>()
@@ -20,18 +19,18 @@ public class BankBalanceStreamApplicationTest extends AbstractStreamApplicationT
     @Test
     public void balanceOnTwoTransactionsOnOnePerson(){
         writeInput(BANK_TRANSACTIONS_INPUT, "John", createTransaction("John", 100, "2018-01-02").toString());
-        compareKeyValue(readOutput(BANK_BALANCE_OUTPUT), "John", createBalance("John", "2018-01-02", 100));
+        assertOutput(BANK_BALANCE_OUTPUT, "John", createBalance("John", "2018-01-02", 100));
         writeInput(BANK_TRANSACTIONS_INPUT, "John", createTransaction("John", 300, "2018-01-02").toString());
-        compareKeyValue(readOutput(BANK_BALANCE_OUTPUT), "John", createBalance("John", "2018-01-02", 400));
+        assertOutput(BANK_BALANCE_OUTPUT, "John", createBalance("John", "2018-01-02", 400));
     }
 
     @Test
     public void balanceOnTwoTransactionsOnOnePersonAndOneTransactionOnAnother(){
         writeInput(BANK_TRANSACTIONS_INPUT, "John", createTransaction("John", 100, "2018-01-02").toString());
-        compareKeyValue(readOutput(BANK_BALANCE_OUTPUT), "John", createBalance("John", "2018-01-02", 100));
+        assertOutput(BANK_BALANCE_OUTPUT, "John", createBalance("John", "2018-01-02", 100));
         writeInput(BANK_TRANSACTIONS_INPUT, "Hellen", createTransaction("Hellen", 150, "2018-01-02").toString());
-        compareKeyValue(readOutput(BANK_BALANCE_OUTPUT), "Hellen", createBalance("Hellen", "2018-01-02", 150));
+        assertOutput(BANK_BALANCE_OUTPUT, "Hellen", createBalance("Hellen", "2018-01-02", 150));
         writeInput(BANK_TRANSACTIONS_INPUT, "John", createTransaction("John", 300, "2018-01-02").toString());
-        compareKeyValue(readOutput(BANK_BALANCE_OUTPUT), "John", createBalance("John", "2018-01-02", 400));
+        assertOutput(BANK_BALANCE_OUTPUT, "John", createBalance("John", "2018-01-02", 400));
     }
 }
