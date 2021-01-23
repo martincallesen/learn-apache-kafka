@@ -46,15 +46,11 @@ public class BankBalanceStreamApplication implements KafkaStreamsParameters {
     }
 
     private static Aggregator<String, String, String> calculateBalance() {
-        return (key, newValue, aggValue) -> {
+        return (key, value, aggValue) -> {
             String jsonBalanceEvent = "";
 
             try {
-                JsonNode jsonNode = getJsonNode(newValue);
-                long amount = jsonNode.get("amount").longValue();
-                String time = jsonNode.get("time").asText();
-                long balance = getBalance(aggValue);
-                jsonBalanceEvent = createBalance(key, time, amount+balance);
+                jsonBalanceEvent = createBalance(key, time(value), calculateBalance(value, aggValue));
 
             } catch (JsonProcessingException e) {
                 LOGGER.error("Could not parsen to json", e);
@@ -64,11 +60,24 @@ public class BankBalanceStreamApplication implements KafkaStreamsParameters {
         };
     }
 
-    private static long getBalance(String aggValue) throws JsonProcessingException {
-        return !"".equals(aggValue) ? getJsonNode(aggValue).get("balance").longValue() : 0L;
+    private static String time(String newValue) throws JsonProcessingException {
+        JsonNode jsonNode = asNode(newValue);
+
+        return jsonNode.get("time").asText();
     }
 
-    private static JsonNode getJsonNode(String json) throws JsonProcessingException {
+    private static long calculateBalance(String newValue, String aggValue) throws JsonProcessingException {
+        JsonNode jsonNode = asNode(newValue);
+        long amount = jsonNode.get("amount").longValue();
+
+        return amount + getBalance(aggValue);
+    }
+
+    private static long getBalance(String aggValue) throws JsonProcessingException {
+        return !"".equals(aggValue) ? asNode(aggValue).get("balance").longValue() : 0L;
+    }
+
+    private static JsonNode asNode(String json) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.readTree(json);
