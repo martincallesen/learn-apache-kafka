@@ -4,3 +4,8 @@ target/
 #IDE
 .idea
 *.iml
+.settings
+bin
+.classpath
+.project
+.vscode
